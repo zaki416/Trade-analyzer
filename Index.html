@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a1a2e">
+    <title>Trade Analyzer Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+            background: linear-gradient(45deg, #00d4ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .upload-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .camera-btn {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(45deg, #00d4ff, #00ff88);
+            border: none;
+            border-radius: 15px;
+            color: #1a1a2e;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 15px;
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+            transition: transform 0.2s;
+        }
+
+        .camera-btn:active {
+            transform: scale(0.95);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-btn {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-btn:hover {
+            border-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .preview-section {
+            display: none;
+            margin-bottom: 20px;
+        }
+
+        .preview-img {
+            width: 100%;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .analyze-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a6f);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
+            transition: transform 0.2s;
+        }
+
+        .analyze-btn:active {
+            transform: scale(0.95);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #00d4ff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result-section {
+            display: none;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .signal-header {
+            text-align: center;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .buy-signal {
+            background: linear-gradient(45deg, #00ff88, #00d4ff);
+            color: #1a1a2e;
+        }
+
+        .sell-signal {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a6f);
+            color: white;
+        }
+
+        .no-trade-signal {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border: 2px solid #ffc107;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 12px;
+            border-left: 3px solid #00d4ff;
+        }
+
+        .info-label {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .info-value {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .explanation {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .explanation h3 {
+            font-size: 14px;
+            margin-bottom: 15px;
+            color: #00d4ff;
+        }
+
+        .explanation-item {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .explanation-item:last-child {
+            border-bottom: none;
+        }
+
+        .confidence-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #00ff88);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .new-analysis-btn {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 11px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Trade Analyzer Pro</h1>
+            <p>Snap • Analyze • Trade</p>
+        </div>
+
+        <div class="upload-section" id="uploadSection">
+            <button class="camera-btn" onclick="openCamera()">
+                📸 Snap Chart
+            </button>
+            <input type="file" id="fileInput" class="file-input" accept="image/*" onchange="handleFileSelect(event)">
+            <label for="fileInput" class="upload-btn">
+                📁 Upload from Gallery
+            </label>
+        </div>
+
+        <div class="preview-section" id="previewSection">
+            <img id="previewImg" class="preview-img" alt="Chart Preview">
+            <button class="analyze-btn" onclick="analyzeChart()">
+                🔍 Analyze Chart
+            </button>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Analyzing chart...</p>
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <div id="signalHeader" class="signal-header"></div>
+            
+            <div class="info-grid" id="infoGrid"></div>
+
+            <div class="explanation">
+                <h3>📝 ANALYSIS BREAKDOWN</h3>
+                <div id="explanationList"></div>
+            </div>
+
+            <button class="new-analysis-btn" onclick="resetApp()">
+                🔄 New Analysis
+            </button>
+        </div>
+
+        <div class="footer">
+            ⚠️ Educational purposes only. Trade at your own risk.
+        </div>
+    </div>
+
+    <script>
+        let currentImage = null;
+
+        function openCamera() {
+            const input = document.getElementById('fileInput');
+            input.setAttribute('capture', 'environment');
+            input.click();
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentImage = e.target.result;
+                    document.getElementById('previewImg').src = currentImage;
+                    document.getElementById('uploadSection').style.display = 'none';
+                    document.getElementById('previewSection').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function analyzeChart() {
+            // Hide preview, show loading
+            document.getElementById('previewSection').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+
+            // Simulate analysis (in real app, this would send to backend)
+            setTimeout(() => {
+                const signal = generateSignal();
+                displayResults(signal);
+            }, 2000);
+        }
+
+        function generateSignal() {
+            // Randomly generate different types of signals for demo
+            const signals = [
+                {
+                    setup: 'BUY',
+                    pair: 'EUR/USD',
+                    timeframe: '4H',
+                    current_price: '1.0850',
+                    entry: '1.0850',
+                    stop_loss: '1.0742',
+                    take_profit: '1.1066',
+                    risk_reward: '1:2',
+                    confidence: 82,
+                    trend: 'UPTREND',
+                    time_estimate: '8-12 hours',
+                    explanation: [
+                        '✅ Strong UPTREND confirmed - Price making higher highs and higher lows',
+                        '✅ Double Bottom pattern detected at key support level',
+                        '✅ Bullish engulfing candle shows strong buying pressure',
+                        '✅ Volume increasing on upward moves',
+                        '✅ RSI showing bullish divergence',
+                        '📊 Strategy: Trend Following + Pattern Recognition',
+                        '⏱️ TP expected within 2-3 candles (8-12 hours)',
+                        '💡 SL placed below recent swing low for protection',
+                        '💡 TP at next major resistance level'
+                    ]
+                },
+                {
+                    setup: 'SELL',
+                    pair: 'GBP/USD',
+                    timeframe: '4H',
+                    current_price: '1.2650',
+                    entry: '1.2650',
+                    stop_loss: '1.2777',
+                    take_profit: '1.2396',
+                    risk_reward: '1:2',
+                    confidence: 78,
+                    trend: 'DOWNTREND',
+                    time_estimate: '8-12 hours',
+                    explanation: [
+                        '✅ Clear DOWNTREND - Lower highs and lower lows',
+                        '✅ Double Top pattern at resistance',
+                        '✅ Bearish engulfing candle confirms selling pressure',
+                        '✅ Price rejected at key resistance zone',
+                        '✅ Moving averages crossed bearish',
+                        '📊 Strategy: Trend Following + Resistance Rejection',
+                        '⏱️ TP expected within 2-3 candles (8-12 hours)',
+                        '💡 SL above recent swing high',
+                        '💡 TP at next support level'
+                    ]
+                },
+                {
+                    setup: 'NO TRADE',
+                    pair: 'USD/JPY',
+                    timeframe: '4H',
+                    current_price: '148.50',
+                    confidence: 45,
+                    trend: 'SIDEWAYS',
+                    explanation: [
+                        '⚠️ Market in consolidation/ranging phase',
+                        '⚠️ No clear trend direction identified',
+                        '⚠️ Conflicting signals from multiple indicators',
+                        '⚠️ Low volume - lack of conviction',
+                        '💡 Wait for breakout above resistance or below support',
+                        '💡 Consider switching to lower timeframe for scalping',
+                        '💡 Or wait for 1-2 more candles for confirmation'
+                    ]
+                }
+            ];
+
+            return signals[Math.floor(Math.random() * signals.length)];
+        }
+
+        function displayResults(signal) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('resultSection').style.display = 'block';
+
+            // Setup header
+            const signalHeader = document.getElementById('signalHeader');
+            signalHeader.textContent = signal.setup === 'NO TRADE' ? '⚠️ NO TRADE' : `${signal.setup === 'BUY' ? '🚀' : '📉'} ${signal.setup}`;
+            signalHeader.className = 'signal-header ' + 
+                (signal.setup === 'BUY' ? 'buy-signal' : 
+                 signal.setup === 'SELL' ? 'sell-signal' : 'no-trade-signal');
+
+            // Setup info grid
+            const infoGrid = document.getElementById('infoGrid');
+            infoGrid.innerHTML = '';
+
+            const infoItems = [
+                { label: 'Pair', value: signal.pair },
+                { label: 'Timeframe', value: signal.timeframe },
+                { label: 'Current Price', value: signal.current_price },
+                { label: 'Trend', value: signal.trend }
+            ];
+
+            if (signal.setup !== 'NO TRADE') {
+                infoItems.push(
+                    { label: 'Entry', value: signal.entry },
+                    { label: 'Stop Loss', value: signal.stop_loss },
+                    { label: 'Take Profit', value: signal.take_profit },
+                    { label: 'Risk/Reward', value: signal.risk_reward },
+                    { label: 'Time Est.', value: signal.time_estimate },
+                    { label: 'Confidence', value: signal.confidence + '%', isConfidence: true }
+                );
+            } else {
+                infoItems.push(
+                    { label: 'Confidence', value: signal.confidence + '%', isConfidence: true }
+                );
+            }
+
+            infoItems.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'info-card';
+                card.innerHTML = `
+                    <div class="info-label">${item.label}</div>
+                    <div class="info-value">${item.value}</div>
+                    ${item.isConfidence ? `<div class="confidence-bar"><div class="confidence-fill" style="width: ${item.value}"></div></div>` : ''}
+                `;
+                infoGrid.appendChild(card);
+            });
+
+            // Setup explanation
+            const explanationList = document.getElementById('explanationList');
+            explanationList.innerHTML = '';
+            signal.explanation.forEach(exp => {
+                const item = document.createElement('div');
+                item.className = 'explanation-item';
+                item.textContent = exp;
+                explanationList.appendChild(item);
+            });
+
+            // Scroll to results
+            document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetApp() {
+            document.getElementById('resultSection').style.display = 'none';
+            document.getElementById('uploadSection').style.display = 'block';
+            document.getElementById('fileInput').value = '';
+            currentImage = null;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Make app installable
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+    </script>
+</body>
+</html>
